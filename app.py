@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import subprocess
+import os
 
 app = Flask(__name__)
 
@@ -15,7 +16,7 @@ def run_code():
 
     try:
         result = subprocess.run(
-            ["python3", "-c", code],
+            ["python", "-c", code],
             input=user_input.encode(),
             capture_output=True,
             timeout=5
@@ -25,6 +26,9 @@ def run_code():
         return jsonify({"output": output, "error": error})
     except subprocess.TimeoutExpired:
         return jsonify({"error": "Code execution timed out."})
-
+    
+    
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
+
